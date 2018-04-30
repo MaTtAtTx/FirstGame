@@ -9,12 +9,12 @@ namespace FirstGame.Controller
 	/// <summary>
 	/// This is the main type for your game.
 	/// </summary>
-	public class SapceGame : Game
+	public class SpaceGame : Game
 	{
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
 
-		public SapceGame()
+		public SpaceGame()
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";

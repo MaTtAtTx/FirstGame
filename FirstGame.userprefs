@@ -1,8 +1,9 @@
 ﻿<Properties StartupConfiguration="{D93F0568-65FC-47DF-9B08-87C2A8D194C5}|Default">
   <MonoDevelop.Ide.ItemProperties.FirstGame PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="FirstGame/Controller/Game1.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="FirstGame/Controller/SpaceGame.cs">
     <Files>
-      <File FileName="FirstGame/Controller/Game1.cs" Line="12" Column="18" />
+      <File FileName="FirstGame/Controller/SpaceGame.cs" Line="12" Column="31" />
+      <File FileName="FirstGame/Controller/Program.cs" Line="14" Column="31" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
