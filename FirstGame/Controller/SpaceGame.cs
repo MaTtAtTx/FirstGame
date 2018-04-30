@@ -3,6 +3,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using FirstGame.Model;
 
 namespace FirstGame.Controller
 {
@@ -13,11 +14,13 @@ namespace FirstGame.Controller
 	{
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
+		private Player player;
 
 		public SpaceGame()
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
+			player = new Player();
 		}
 
 		/// <summary>
@@ -43,6 +46,9 @@ namespace FirstGame.Controller
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 
 			//TODO: use this.Content to load your game content here 
+			Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, GraphicsDevice.Viewport.TitleSafeArea.Y + GraphicsDevice.Viewport.TitleSafeArea.Height / 2);
+
+			player.Initialize(Content.Load<Texture2D>("Texture/player"), playerPosition);
 		}
 
 		/// <summary>
@@ -73,7 +79,9 @@ namespace FirstGame.Controller
 			graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
 			//TODO: Add your drawing code here
-
+			spriteBatch.Begin();
+			player.Draw(spriteBatch);
+			spriteBatch.End();
 			base.Draw(gameTime);
 		}
 	}
