@@ -18,12 +18,17 @@ namespace FirstGame.Controller
 		private GamePadState currentGamePadState;
 		private GamePadState previousGamePadState;
 		private float playerMoveSpeed;
+		private Texture2D mainBackground;
+		private ParallaxingBackground bgLayer1;
+		private ParallaxingBackground bgLayer2;
 
 		public SpaceGame()
 		{
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
 			player = new Player();
+			bgLayer1 = new ParallaxingBackground();
+			bgLayer2 = new ParallaxingBackground();
 		}
 
 		protected override void Initialize()
@@ -39,6 +44,12 @@ namespace FirstGame.Controller
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 
 			//TODO: use this.Content to load your game content here 
+
+			// Load the parallaxing background
+			bgLayer1.Initialize(Content, "Texture/bgLayer1", GraphicsDevice.Viewport.Width, -1);
+			bgLayer2.Initialize(Content, "Texture/bgLayer2", GraphicsDevice.Viewport.Width, -2);
+
+			mainBackground = Content.Load<Texture2D>("Texture/mainbackground");
 
 			// Load the player resources
 			Animation playerAnimation = new Animation();
@@ -68,6 +79,10 @@ namespace FirstGame.Controller
 
 			UpdatePlayer(gameTime);
 			base.Update(gameTime);
+
+			// Update the parallaxing background
+			bgLayer1.Update();
+			bgLayer2.Update();
 		}
 
 		private void UpdatePlayer(GameTime gameTime)
@@ -81,7 +96,7 @@ namespace FirstGame.Controller
     		// Use the Keyboard / Dpad
     		if (currentKeyboardState.IsKeyDown(Keys.Left) || currentGamePadState.DPad.Left == ButtonState.Pressed)
     		{
-      		  player.Position.X -= playerMoveSpeed;
+      		  	player.Position.X -= playerMoveSpeed;
    			}
     		if (currentKeyboardState.IsKeyDown(Keys.Right) || currentGamePadState.DPad.Right == ButtonState.Pressed)
     		{
@@ -107,6 +122,9 @@ namespace FirstGame.Controller
 
 			//TODO: Add your drawing code here
 			spriteBatch.Begin();
+			spriteBatch.Draw(mainBackground, Vector2.Zero, Color.White);
+			bgLayer1.Draw(spriteBatch);
+			bgLayer2.Draw(spriteBatch);
 			player.Draw(spriteBatch);
 			spriteBatch.End();
 			base.Draw(gameTime);
