@@ -31,9 +31,7 @@ namespace FirstGame.Controller
 #endif
 		}
 
-		/// <summary>
 		/// The main entry point for the application.
-		/// </summary>
 #if !MONOMAC && !__IOS__ && !__TVOS__
 		[STAThread]
 #endif
