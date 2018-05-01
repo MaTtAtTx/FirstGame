@@ -37,8 +37,6 @@ namespace FirstGame.View
 		public Animation()
 		{
 		}
-
-		// Width of a given frame
 		private int frameWidth;
 		public int FrameWidth
 		{
@@ -46,7 +44,6 @@ namespace FirstGame.View
 			set { frameWidth = value; }
 		}
 
-		// Height of a given frame
 		private int frameHeight;
 		public int FrameHeight
 		{
@@ -54,7 +51,6 @@ namespace FirstGame.View
 			set { frameHeight = value; }
 		}
 
-		// The state of the Animation
 		private bool active;
 		public bool Active
 		{
@@ -97,46 +93,35 @@ namespace FirstGame.View
 
 		public void Update(GameTime gameTime)
 		{
-			// Do not update the game if we are not active
 			if (Active == false)
 			{
 				return;
 			}
-			// Update the elapsed time
 			elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
 
-			// If the elapsed time is larger than the frame time
-			// we need to switch frames
 			if (elapsedTime > frameTime)
 			{
-				// Move to the next frame
 				currentFrame++;
 
-				// If the currentFrame is equal to frameCount reset currentFrame to zero
 				if (currentFrame == frameCount)
 				{
 					currentFrame = 0;
-					// If we are not looping deactivate the animation
 					if (Looping == false)
 					{
 						Active = false;
 					}
 				}
 
-				// Reset the elapsed time to zero
 				elapsedTime = 0;
 			}
 
-			// Grab the correct frame in the image strip by multiplying the currentFrame index by the frame width
 			sourceRect = new Rectangle(currentFrame * FrameWidth, 0, FrameWidth, FrameHeight);
 
-			// Grab the correct frame in the image strip by multiplying the currentFrame index by the frame width
 			destinationRect = new Rectangle((int)Position.X - (int)(FrameWidth * scale) / 2, (int)Position.Y - (int)(FrameHeight * scale) / 2, (int)(FrameWidth * scale), (int)(FrameHeight * scale));
 		}
 
 		public void Draw(SpriteBatch spriteBatch)
 		{
-			// Only draw the animation when we are active
 			if (Active)
 			{
 				spriteBatch.Draw(spriteStrip, destinationRect, sourceRect, color);
