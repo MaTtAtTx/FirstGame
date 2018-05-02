@@ -31,6 +31,8 @@ namespace FirstGame.Controller
 		private List<Projectile> projectiles;
 		private TimeSpan fireTime;
 		private TimeSpan previousFireTime;
+		private Texture2D explosionTexture;
+		private List<Animation> explosions;
 
 		public SpaceGame()
 		{
@@ -51,6 +53,7 @@ namespace FirstGame.Controller
 			random = new Random();
 			projectiles = new List<Projectile>();
 			fireTime = TimeSpan.FromSeconds(.15f);
+			explosions = new List<Animation>();
 			base.Initialize();
 		}
 
@@ -78,8 +81,8 @@ namespace FirstGame.Controller
 			playerMoveSpeed = 8.0f;
 
 			enemyTexture = Content.Load<Texture2D>("Animation/mineAnimation");
-
 			projectileTexture = Content.Load<Texture2D>("Texture/laser");
+			explosionTexture = Content.Load<Texture2D>("Animation/explosion");
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -106,6 +109,7 @@ namespace FirstGame.Controller
 			UpdateEnemies(gameTime);
 			UpdateCollision();
 			UpdateProjectiles();
+			UpdateExplosions(gameTime);
 
 			base.Update(gameTime);
 		}
@@ -171,6 +175,11 @@ namespace FirstGame.Controller
 			{
 				projectiles[i].Draw(spriteBatch);
 			}
+			// Draw the explosions
+			for (int i = 0; i < explosions.Count; i++)
+			{
+				explosions[i].Draw(spriteBatch);
+			}
 			spriteBatch.End();
 			base.Draw(gameTime);
 
@@ -215,6 +224,12 @@ namespace FirstGame.Controller
 
 				if (enemies[i].Active == false)
 				{
+					// If not active and health <= 0
+					if (enemies[i].Health <= 0)
+					{
+						// Add an explosion
+						AddExplosion(enemies[i].Position);
+					}
 					enemies.RemoveAt(i);
 				}
 			}
@@ -292,6 +307,25 @@ namespace FirstGame.Controller
 				if (projectiles[i].Active == false)
 				{
 					projectiles.RemoveAt(i);
+				}
+			}
+		}
+
+		private void AddExplosion(Vector2 position)
+		{
+			Animation explosion = new Animation();
+			explosion.Initialize(explosionTexture, position, 134, 134, 12, 45, Color.White, 1f, false);
+			explosions.Add(explosion);
+		}
+
+		private void UpdateExplosions(GameTime gameTime)
+		{
+			for (int i = explosions.Count - 1; i >= 0; i--)
+			{
+				explosions[i].Update(gameTime);
+				if (explosions[i].Active == false)
+				{
+					explosions.RemoveAt(i);
 				}
 			}
 		}
