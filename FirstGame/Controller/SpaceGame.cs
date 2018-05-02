@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework.Input;
 using FirstGame.Model;
 using FirstGame.View;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace FirstGame.Controller
 {
@@ -33,6 +35,9 @@ namespace FirstGame.Controller
 		private TimeSpan previousFireTime;
 		private Texture2D explosionTexture;
 		private List<Animation> explosions;
+		private SoundEffect laserSound;
+		private SoundEffect explosionSound;
+		private Song gameplayMusic;
 
 		public SpaceGame()
 		{
@@ -83,6 +88,16 @@ namespace FirstGame.Controller
 			enemyTexture = Content.Load<Texture2D>("Animation/mineAnimation");
 			projectileTexture = Content.Load<Texture2D>("Texture/laser");
 			explosionTexture = Content.Load<Texture2D>("Animation/explosion");
+
+			// Load the music
+			gameplayMusic = Content.Load<Song>("Sound/gameMusic");
+
+			// Load the laser and explosion sound effect
+			laserSound = Content.Load<SoundEffect>("Sound/laserFire");
+			explosionSound = Content.Load<SoundEffect>("Sound/explosion");
+
+			// Start the music right away
+			PlayMusic(gameplayMusic);
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -152,6 +167,8 @@ namespace FirstGame.Controller
 
 				// Add the projectile, but add it to the front and center of the player
 				AddProjectile(player.Position + new Vector2(player.Width / 2, 0));
+				// Play the laser sound
+				laserSound.Play();
 			}
 		}
 
@@ -229,6 +246,8 @@ namespace FirstGame.Controller
 					{
 						// Add an explosion
 						AddExplosion(enemies[i].Position);
+						// Play the explosion sound
+						explosionSound.Play();
 					}
 					enemies.RemoveAt(i);
 				}
@@ -328,6 +347,21 @@ namespace FirstGame.Controller
 					explosions.RemoveAt(i);
 				}
 			}
+		}
+
+		private void PlayMusic(Song song)
+		{
+			// Due to the way the MediaPlayer plays music,
+			// we have to catch the exception. Music will play when the game is not tethered
+			try
+			{
+				// Play the music
+				MediaPlayer.Play(song);
+
+				// Loop the currently playing song
+				MediaPlayer.IsRepeating = true;
+			}
+			catch { } //No Exception is handled so it is an empty/anonymous excepti
 		}
 	}
 }
