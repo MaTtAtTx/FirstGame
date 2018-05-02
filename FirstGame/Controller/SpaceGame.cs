@@ -240,9 +240,9 @@ namespace FirstGame.Controller
 						// Play the explosion sound
 						explosionSound.Play();
 					}
-					enemies.RemoveAt(i);
 					//Add to the player's score
 					score += enemies[i].ScoreValue;
+					enemies.RemoveAt(i);
 				}
 			}
 		}
