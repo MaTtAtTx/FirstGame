@@ -37,6 +37,8 @@ namespace FirstGame.Controller
 		private SoundEffect laserSound;
 		private SoundEffect explosionSound;
 		private Song gameplayMusic;
+		private int score;
+		private SpriteFont font;
 
 		public SpaceGame()
 		{
@@ -58,6 +60,7 @@ namespace FirstGame.Controller
 			projectiles = new List<Projectile>();
 			fireTime = TimeSpan.FromSeconds(.15f);
 			explosions = new List<Animation>();
+			score = 0;
 			base.Initialize();
 		}
 
@@ -97,6 +100,39 @@ namespace FirstGame.Controller
 
 			// Start the music right away
 			PlayMusic(gameplayMusic);
+		}
+
+		protected override void Draw(GameTime gameTime)
+		{
+			graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+
+			//TODO: Add your drawing code here
+			spriteBatch.Begin();
+			spriteBatch.Draw(mainBackground, Vector2.Zero, Color.White);
+			bgLayer1.Draw(spriteBatch);
+			bgLayer2.Draw(spriteBatch);
+			player.Draw(spriteBatch);
+			// Draw the Enemies
+			for (int i = 0; i < enemies.Count; i++)
+			{
+				enemies[i].Draw(spriteBatch);
+			}
+			// Draw the Projectiles
+			for (int i = 0; i < projectiles.Count; i++)
+			{
+				projectiles[i].Draw(spriteBatch);
+			}
+			// Draw the explosions
+			for (int i = 0; i < explosions.Count; i++)
+			{
+				explosions[i].Draw(spriteBatch);
+			}
+			// Draw the score
+			spriteBatch.DrawString(font, "score: " + score, new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, GraphicsDevice.Viewport.TitleSafeArea.Y), Color.White);
+			// Draw the player health
+			spriteBatch.DrawString(font, "health: " + player.Health, new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, GraphicsDevice.Viewport.TitleSafeArea.Y + 30), Color.White);
+			spriteBatch.End();
+			base.Draw(gameTime);
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -169,57 +205,13 @@ namespace FirstGame.Controller
 				// Play the laser sound
 				laserSound.Play();
 			}
-		}
 
-		protected override void Draw(GameTime gameTime)
-		{
-			graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-
-			//TODO: Add your drawing code here
-			spriteBatch.Begin();
-			spriteBatch.Draw(mainBackground, Vector2.Zero, Color.White);
-			bgLayer1.Draw(spriteBatch);
-			bgLayer2.Draw(spriteBatch);
-			player.Draw(spriteBatch);
-			// Draw the Enemies
-			for (int i = 0; i < enemies.Count; i++)
+			// reset score if player health goes to zero
+			if (player.Health <= 0)
 			{
-				enemies[i].Draw(spriteBatch);
+				player.Health = 100;
+				score = 0;
 			}
-			// Draw the Projectiles
-			for (int i = 0; i < projectiles.Count; i++)
-			{
-				projectiles[i].Draw(spriteBatch);
-			}
-			// Draw the explosions
-			for (int i = 0; i < explosions.Count; i++)
-			{
-				explosions[i].Draw(spriteBatch);
-			}
-			spriteBatch.End();
-			base.Draw(gameTime);
-
-		}
-
-		private void AddEnemy()
-		{
-			// Create the animation object
-			Animation enemyAnimation = new Animation();
-
-			// Initialize the animation with the correct animation information
-			enemyAnimation.Initialize(enemyTexture, Vector2.Zero, 47, 61, 8, 30, Color.White, 1f, true);
-
-			// Randomly generate the position of the enemy
-			Vector2 position = new Vector2(GraphicsDevice.Viewport.Width + enemyTexture.Width / 2, random.Next(100, GraphicsDevice.Viewport.Height - 100));
-
-			// Create an enemy
-			Enemy enemy = new Enemy();
-
-			// Initialize the enemy
-			enemy.Initialize(enemyAnimation, position);
-
-			// Add the enemy to the active enemies list
-			enemies.Add(enemy);
 		}
 
 		private void UpdateEnemies(GameTime gameTime)
@@ -249,6 +241,8 @@ namespace FirstGame.Controller
 						explosionSound.Play();
 					}
 					enemies.RemoveAt(i);
+					//Add to the player's score
+					score += enemies[i].ScoreValue;
 				}
 			}
 		}
@@ -308,13 +302,6 @@ namespace FirstGame.Controller
 			}
 		}
 
-		private void AddProjectile(Vector2 position)
-		{
-			Projectile projectile = new Projectile();
-			projectile.Initialize(GraphicsDevice.Viewport, projectileTexture, position);
-			projectiles.Add(projectile);
-		}
-
 		private void UpdateProjectiles()
 		{
 			// Update the Projectiles
@@ -329,13 +316,6 @@ namespace FirstGame.Controller
 			}
 		}
 
-		private void AddExplosion(Vector2 position)
-		{
-			Animation explosion = new Animation();
-			explosion.Initialize(explosionTexture, position, 134, 134, 12, 45, Color.White, 1f, false);
-			explosions.Add(explosion);
-		}
-
 		private void UpdateExplosions(GameTime gameTime)
 		{
 			for (int i = explosions.Count - 1; i >= 0; i--)
@@ -346,6 +326,41 @@ namespace FirstGame.Controller
 					explosions.RemoveAt(i);
 				}
 			}
+		}
+
+		private void AddEnemy()
+		{
+			// Create the animation object
+			Animation enemyAnimation = new Animation();
+
+			// Initialize the animation with the correct animation information
+			enemyAnimation.Initialize(enemyTexture, Vector2.Zero, 47, 61, 8, 30, Color.White, 1f, true);
+
+			// Randomly generate the position of the enemy
+			Vector2 position = new Vector2(GraphicsDevice.Viewport.Width + enemyTexture.Width / 2, random.Next(100, GraphicsDevice.Viewport.Height - 100));
+
+			// Create an enemy
+			Enemy enemy = new Enemy();
+
+			// Initialize the enemy
+			enemy.Initialize(enemyAnimation, position);
+
+			// Add the enemy to the active enemies list
+			enemies.Add(enemy);
+		}
+
+		private void AddProjectile(Vector2 position)
+		{
+			Projectile projectile = new Projectile();
+			projectile.Initialize(GraphicsDevice.Viewport, projectileTexture, position);
+			projectiles.Add(projectile);
+		}
+
+		private void AddExplosion(Vector2 position)
+		{
+			Animation explosion = new Animation();
+			explosion.Initialize(explosionTexture, position, 134, 134, 12, 45, Color.White, 1f, false);
+			explosions.Add(explosion);
 		}
 
 		private void PlayMusic(Song song)
