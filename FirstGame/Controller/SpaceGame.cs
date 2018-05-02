@@ -27,6 +27,10 @@ namespace FirstGame.Controller
 		private TimeSpan enemySpawnTime;
 		private TimeSpan previousSpawnTime;
 		private Random random;
+		private Texture2D projectileTexture;
+		private List<Projectile> projectiles;
+		private TimeSpan fireTime;
+		private TimeSpan previousFireTime;
 
 		public SpaceGame()
 		{
@@ -45,7 +49,9 @@ namespace FirstGame.Controller
 			previousSpawnTime = TimeSpan.Zero;
 			enemySpawnTime = TimeSpan.FromSeconds(1.0f);
 			random = new Random();
-			base.Initialize();base
+			projectiles = new List<Projectile>();
+			fireTime = TimeSpan.FromSeconds(.15f);
+			base.Initialize();
 		}
 
 		protected override void LoadContent()
@@ -72,6 +78,8 @@ namespace FirstGame.Controller
 			playerMoveSpeed = 8.0f;
 
 			enemyTexture = Content.Load<Texture2D>("Animation/mineAnimation");
+
+			projectileTexture = Content.Load<Texture2D>("Texture/laser");
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -96,8 +104,8 @@ namespace FirstGame.Controller
 			bgLayer2.Update();
 
 			UpdateEnemies(gameTime);
-
 			UpdateCollision();
+			UpdateProjectiles();
 
 			base.Update(gameTime);
 		}
@@ -131,6 +139,16 @@ namespace FirstGame.Controller
 			// Make sure that the player does not go out of bounds
 			player.Position.X = MathHelper.Clamp(player.Position.X, 0, GraphicsDevice.Viewport.Width - player.Width);
 			player.Position.Y = MathHelper.Clamp(player.Position.Y, 0, GraphicsDevice.Viewport.Height - player.Height);
+
+			// Fire only every interval we set as the fireTime
+			if (gameTime.TotalGameTime - previousFireTime > fireTime)
+			{
+				// Reset our current time
+				previousFireTime = gameTime.TotalGameTime;
+
+				// Add the projectile, but add it to the front and center of the player
+				AddProjectile(player.Position + new Vector2(player.Width / 2, 0));
+			}
 		}
 
 		protected override void Draw(GameTime gameTime)
@@ -143,9 +161,15 @@ namespace FirstGame.Controller
 			bgLayer1.Draw(spriteBatch);
 			bgLayer2.Draw(spriteBatch);
 			player.Draw(spriteBatch);
+			// Draw the Enemies
 			for (int i = 0; i < enemies.Count; i++)
 			{
 				enemies[i].Draw(spriteBatch);
+			}
+			// Draw the Projectiles
+			for (int i = 0; i < projectiles.Count; i++)
+			{
+				projectiles[i].Draw(spriteBatch);
 			}
 			spriteBatch.End();
 			base.Draw(gameTime);
@@ -227,6 +251,47 @@ namespace FirstGame.Controller
 					{
 						player.Active = false;
 					}
+				}
+			}
+
+			// Projectile vs Enemy Collision
+			for (int i = 0; i < projectiles.Count; i++)
+			{
+				for (int j = 0; j < enemies.Count; j++)
+				{
+					// Create the rectangles we need to determine if we collided with each other
+					rectangle1 = new Rectangle((int)projectiles[i].Position.X - projectiles[i].Width / 2, (int)projectiles[i].Position.Y -
+			 projectiles[i].Height / 2, projectiles[i].Width, projectiles[i].Height);
+
+					rectangle2 = new Rectangle((int)enemies[j].Position.X - enemies[j].Width / 2, (int)enemies[j].Position.Y - enemies[j].Height / 2, enemies[j].Width, enemies[j].Height);
+
+					// Determine if the two objects collided with each other
+					if (rectangle1.Intersects(rectangle2))
+					{
+						enemies[j].Health -= projectiles[i].Damage;
+						projectiles[i].Active = false;
+					}
+				}
+			}
+		}
+
+		private void AddProjectile(Vector2 position)
+		{
+			Projectile projectile = new Projectile();
+			projectile.Initialize(GraphicsDevice.Viewport, projectileTexture, position);
+			projectiles.Add(projectile);
+		}
+
+		private void UpdateProjectiles()
+		{
+			// Update the Projectiles
+			for (int i = projectiles.Count - 1; i >= 0; i--)
+			{
+				projectiles[i].Update();
+
+				if (projectiles[i].Active == false)
+				{
+					projectiles.RemoveAt(i);
 				}
 			}
 		}
