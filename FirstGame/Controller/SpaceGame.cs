@@ -45,7 +45,7 @@ namespace FirstGame.Controller
 			previousSpawnTime = TimeSpan.Zero;
 			enemySpawnTime = TimeSpan.FromSeconds(1.0f);
 			random = new Random();
-			base.Initialize();
+			base.Initialize();base
 		}
 
 		protected override void LoadContent()
